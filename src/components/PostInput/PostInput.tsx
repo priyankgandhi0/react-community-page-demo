@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Avatar, Card } from '@mui/material';
+import { useAuthContext } from '../../providers/AuthProvider/auth-context.ts';
+import axios from 'axios';
 
-const PostInput = ({ selectedUser, setPosts }) => {
+const PostInput = () => {
+  const { currentUser } = useAuthContext();
   const [postText, setPostText] = useState('');
 
   const truncateText = (text, maxLength) => {
@@ -11,29 +14,37 @@ const PostInput = ({ selectedUser, setPosts }) => {
     return text;
   };
 
-  const handlePostSubmit = (event) => {
+
+  const handlePostSubmit = async (event) => {
     event.preventDefault();
     if (!postText.trim()) return;
 
     // Create a new post object
     const newPost = {
-      postId: Date.now(),
-      userId: selectedUser.userId,
-      description: truncateText(postText, 500),
+      title: truncateText(postText, 500),
       comments: [],
+      userId: currentUser?.id || 0, // Use fallback ID if no user is logged in
     };
 
-    // Update the posts state by adding the new post at the beginning
-    setPosts((prevPosts) => [newPost, ...prevPosts]);
+    try {
+      // Send a POST request to the JSON Server
+      const response = await axios.post('http://localhost:8000/posts', newPost);
 
-    setPostText('');
+      // Update local state with the new post
+      // setPosts((prevPosts) => [...prevPosts, response.data]);
+
+      // Clear the input field
+      setPostText('');
+    } catch (error) {
+      console.error('Error adding post:', error);
+    }
   };
 
   return (
     <Box>
       <Card sx={{ mb: 2, p: 3 }}>
         <Box sx={{ display: 'flex' }}>
-          <Avatar src={selectedUser.image} sx={{ mr: 2 }} />
+          <Avatar src={currentUser?.image} sx={{ mr: 2 }} />
           <Box sx={{ width: '100%', height: '100%' }}>
             <form onSubmit={handlePostSubmit}>
               <TextField

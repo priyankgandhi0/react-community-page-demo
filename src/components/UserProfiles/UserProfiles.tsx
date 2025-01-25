@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Typography,
   Avatar,
@@ -9,13 +9,14 @@ import {
   ListItemAvatar,
   Box,
 } from '@mui/material';
-import usersData from '../../data/users.json';
+import { useAuthContext } from '../../providers/AuthProvider/auth-context.ts';
+import { User } from '../../types/commonType';
 
-const UserProfiles = ({selectedUser, changeUser}) => {
-  const [users] = useState(usersData.users);
-  const userId = selectedUser.userId;
-  const handleUserClick = (user: object) => {
-    changeUser(user);
+const UserProfiles = () => {
+  const { currentUser, setCurrentUser, users } = useAuthContext();
+  const userId = currentUser?.id;
+  const handleUserClick = (user: User) => {
+    setCurrentUser(user)
   };
 
   return (
@@ -35,18 +36,18 @@ const UserProfiles = ({selectedUser, changeUser}) => {
       <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
         {users.map((user) => (
           <ListItem
-            key={user.userId}
+            key={user.id}
             onClick={() => handleUserClick(user)}
             sx={{
               cursor: 'pointer',
               borderRadius: '10px',
               bgcolor:
-              userId === user.userId ? 'primary.light' : 'background.paper',
-              color:  userId === user.userId ? 'white' : 'black',
+                userId === user.id ? 'primary.light' : 'background.paper',
+              color: userId === user.id ? 'white' : 'black',
               transition: 'background-color 0.3s',
               mb: 1,
               '&:hover': {
-                bgcolor: userId === user.userId ? 'primary.light' : '#f5f5f5',
+                bgcolor: userId === user.id ? 'primary.light' : '#f5f5f5',
               },
             }}
           >
@@ -56,7 +57,7 @@ const UserProfiles = ({selectedUser, changeUser}) => {
             <ListItemText
               primary={user.name}
               sx={{
-                fontWeight: userId === user.userId ? 'bold' : 'normal',
+                fontWeight: userId === user.id ? 'bold' : 'normal',
               }}
             />
           </ListItem>

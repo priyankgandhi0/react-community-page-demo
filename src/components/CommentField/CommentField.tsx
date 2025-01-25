@@ -11,7 +11,7 @@ const CommentField = ({ postId, selectedUser, handleCommentSubmit }) => {
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-      <Avatar src={selectedUser.image} />
+      <Avatar src={selectedUser?.image} />
       <TextField
         placeholder="Add a comment..."
         size="small"

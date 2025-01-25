@@ -90,6 +90,27 @@ const Posts = ({ selectedUser, posts, setPosts, replies, setReplies }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [postsResponse, usersResponse] = await Promise.all([
+          fetch('http://localhost:8000/posts'),
+          fetch('http://localhost:8000/users'),
+        ]);
+        const postsData = await postsResponse.json();
+        const usersData = await usersResponse.json();
+        setPosts(postsData);
+        console.log('usersData: ', usersData);
+        // setUsers(usersData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  console.log('posts: ', posts);
   return (
     <Box>
       {posts.map((post) => {
@@ -107,7 +128,7 @@ const Posts = ({ selectedUser, posts, setPosts, replies, setReplies }) => {
 
               <Box>
                 <Typography variant="body1" sx={{ mt: 2 }}>
-                  {post.description}
+                  {post.title}
                 </Typography>
               </Box>
             </CardContent>
