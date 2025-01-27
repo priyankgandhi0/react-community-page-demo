@@ -2,6 +2,8 @@ export interface Comment {
   id: number;
   userId: number;
   text: string;
+  replies: Comment[];
+  createdAt: Date;
 }
 
 export interface Post {
@@ -9,6 +11,7 @@ export interface Post {
   userId: number;
   title: string;
   comments: Comment[];
+  createdAt: Date;
 }
 
 export interface User {

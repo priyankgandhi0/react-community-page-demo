@@ -1,27 +1,37 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Avatar } from "@mui/material";
 import { useAuthContext } from "../../providers/AuthProvider/auth-context.ts";
-import axios from "axios";
 import { usePostContext } from "../../providers/PostsProvider/posts-context.ts";
 import { Comment } from "../../types/commonType.ts";
+import axios from "axios";
 
-const CommentField = ({ post }) => {
+const ReplyField = ({ post }) => {
   const [commentText, setCommentText] = useState("");
   const { currentUser } = useAuthContext();
-  const { setLoadingSave } = usePostContext();
+  const { setLoadingSave, selectedCommentId, setSelectedCommentId } =
+    usePostContext();
 
   const handleSubmit = async () => {
     setLoadingSave(true);
-    const newComment: Comment = {
-      id: Date.now(),
-      userId: currentUser?.id || 0, // Use fallback ID if no user is logged in
-      text: commentText,
-      replies: [],
-      createdAt: new Date(),
-    };
+    const updatedComments: Comment[] = post.comments.map((o) => {
+      if (o.id === selectedCommentId)
+        return {
+          ...o,
+          replies: [
+            ...o.replies,
+            {
+              id: Date.now(),
+              userId: currentUser?.id || 0,
+              text: commentText,
+              createdAt: new Date(),
+            },
+          ],
+        };
+      return o;
+    });
     const updatedPost = {
       ...post,
-      comments: [...post.comments, newComment],
+      comments: [...updatedComments],
       userId: currentUser?.id || 0, // Use fallback ID if no user is logged in
       createdAt: new Date(),
     };
@@ -33,6 +43,7 @@ const CommentField = ({ post }) => {
       // Clear the input field
       setCommentText("");
       setLoadingSave(false);
+      setSelectedCommentId(undefined);
     } catch (error) {
       console.error("Error adding post:", error);
     }
@@ -60,10 +71,10 @@ const CommentField = ({ post }) => {
         sx={{ borderRadius: "10px" }}
         onClick={handleSubmit}
       >
-        Comment
+        Reply
       </Button>
     </Box>
   );
 };
 
-export default CommentField;
+export default ReplyField;
